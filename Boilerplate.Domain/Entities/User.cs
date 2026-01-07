@@ -1,0 +1,32 @@
+using Boilerplate.Domain.Common;
+using Boilerplate.Domain.Common.Interfaces;
+
+namespace Boilerplate.Domain.Entities;
+
+/// <summary>
+/// User entity representing an authenticated user in the system.
+/// Implements ISoftDeletable for soft delete and IAuditable for user tracking.
+/// </summary>
+public class User : BaseEntity, ISoftDeletable, IAuditable
+{
+    // Core user properties
+    public string Email { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
+    public string? FullName { get; set; }
+    public string? Bio { get; set; }
+    public string? AvatarUrl { get; set; }
+    public bool IsEmailVerified { get; set; } = false;
+    public Guid? RoleId { get; set; }
+    public DateTime? LastLoginAt { get; set; }
+
+    // ISoftDeletable implementation
+    public DateTime? DeletedAt { get; set; }
+    public Guid? DeletedBy { get; set; }
+
+    // IAuditable implementation
+    public Guid? CreatedBy { get; set; }
+    public Guid? UpdatedBy { get; set; }
+
+    // Navigation property
+    public Role? Role { get; set; }
+}
