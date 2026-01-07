@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Text.Json;
 using Boilerplate.Application.Common.Exceptions;
+using Serilog;
 
 namespace Boilerplate.Presentation.Middleware;
 
@@ -8,7 +9,7 @@ namespace Boilerplate.Presentation.Middleware;
 /// Global exception handling middleware.
 /// Maps AppException types to HTTP responses automatically.
 /// </summary>
-public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+public class ExceptionMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -19,14 +20,14 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
         catch (AppException ex)
         {
             // Expected business exception - log as warning
-            logger.LogWarning("Business exception: {ErrorCode} - {Message}", ex.ErrorCode, ex.Message);
+            Log.Warning("Business exception: {ErrorCode} - {Message}", ex.ErrorCode, ex.Message);
             await WriteErrorResponse(context, ex.StatusCode, ex.Message, ex.ErrorCode);
         }
         catch (Exception ex)
         {
             // Unexpected exception - log as error with trace
             var traceId = Activity.Current?.Id ?? context.TraceIdentifier;
-            logger.LogError(ex, "Unhandled exception. TraceId: {TraceId}", traceId);
+            Log.Error(ex, "Unhandled exception. TraceId: {TraceId}", traceId);
             await WriteErrorResponse(context, 500, "An unexpected error occurred.", "ServerError", traceId);
         }
     }

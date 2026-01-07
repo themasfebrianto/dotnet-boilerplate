@@ -2,8 +2,14 @@ using Boilerplate.Application;
 using Boilerplate.Infrastructure;
 using Boilerplate.Presentation.Extensions;
 using Boilerplate.Presentation.Middleware;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ============================================
+// Logging (must be first for early errors)
+// ============================================
+builder.AddSerilogLogging();
 
 // ============================================
 // Service Registration (each layer owns its DI)
@@ -22,20 +28,42 @@ var app = builder.Build();
 // 1. Exception handling (must be first to catch all exceptions)
 app.UseExceptionMiddleware();
 
-// 2. Swagger (development only)
+// 2. Serilog request logging (after exception middleware)
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000}ms";
+});
+
+// 3. Swagger (development only)
 app.UseSwaggerDocumentation(app.Environment);
 
-// 3. CORS
+// 4. CORS
 app.UseCorsPolicy();
 
-// 4. Authentication & Authorization
+// 5. Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 5. Map controllers
+// 6. Map controllers
 app.MapControllers();
+
+// 7. Serilog cleanup on shutdown
+app.UseSerilogCleanup();
 
 // ============================================
 // Run
 // ============================================
-app.Run();
+Log.Information("Starting Boilerplate API...");
+
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
