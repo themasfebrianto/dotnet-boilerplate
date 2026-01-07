@@ -483,13 +483,13 @@ app.Run();
 ### Phase 4: Infrastructure Layer
 | Step | Task | Status |
 |------|------|--------|
-| 4.1 | `Identity/JwtProvider.cs` | ⬜ |
-| 4.2 | `Persistence/MongoDbContext.cs` | ⬜ |
-| 4.3 | `Persistence/MongoMappings.cs` | ⬜ |
-| 4.4 | `Persistence/Common/*` | ⬜ |
-| 4.5 | `Persistence/Repositories/*` | ⬜ |
-| 4.6 | `Storage/ImageStorageService.cs` | ⬜ |
-| 4.7 | `DependencyInjection.cs` | ⬜ |
+| 4.1 | `Identity/JwtProvider.cs` | ✅ |
+| 4.2 | `Persistence/MongoDbContext.cs` | ✅ |
+| 4.3 | `Persistence/MongoMappings.cs` | ✅ |
+| 4.4 | `Persistence/Common/*` | ✅ |
+| 4.5 | `Persistence/Repositories/*` | ✅ |
+| 4.6 | `Storage/LocalImageStorageService.cs` | ✅ |
+| 4.7 | `DependencyInjection.cs` | ✅ |
 
 ### Phase 5: Presentation Layer
 | Step | Task | Status |
