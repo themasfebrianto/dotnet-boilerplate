@@ -1,9 +1,11 @@
+using Boilerplate.Application.Common.Abstractions;
+
 namespace Boilerplate.Application.DTOs.User;
 
 /// <summary>
 /// Response DTO for user data.
 /// </summary>
-public class UserResponseDto
+public class UserResponseDto : IHasId
 {
     public Guid Id { get; set; }
     public string Email { get; set; } = null!;

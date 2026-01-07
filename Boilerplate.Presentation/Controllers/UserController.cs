@@ -9,10 +9,9 @@ namespace Boilerplate.Presentation.Controllers;
 /// User management endpoints.
 /// Controllers are thin - just call service and return.
 /// </summary>
-[ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IUserService userService) : ApiController
 {
     [HttpGet]
     public async Task<List<UserResponseDto>> GetAll()
@@ -30,7 +29,7 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<ActionResult<UserResponseDto>> Create([FromBody] UserRequestDto request)
     {
         var user = await userService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        return Created(user);
     }
 
     [HttpPut("{id:guid}")]
@@ -38,30 +37,18 @@ public class UserController(IUserService userService) : ControllerBase
         => await userService.UpdateAsync(id, request);
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        await userService.DeleteAsync(id);
-        return NoContent();
-    }
+    public async Task Delete(Guid id)
+        => await userService.DeleteAsync(id);
 
     [HttpPost("{id:guid}/change-password")]
-    public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordRequestDto request)
-    {
-        await userService.ChangePasswordAsync(id, request);
-        return NoContent();
-    }
+    public async Task ChangePassword(Guid id, [FromBody] ChangePasswordRequestDto request)
+        => await userService.ChangePasswordAsync(id, request);
 
     [HttpPost("{id:guid}/soft-delete")]
-    public async Task<IActionResult> SoftDelete(Guid id)
-    {
-        await userService.SoftDeleteAsync(id);
-        return NoContent();
-    }
+    public async Task SoftDelete(Guid id)
+        => await userService.SoftDeleteAsync(id);
 
     [HttpPost("{userId:guid}/role/{roleId:guid}")]
-    public async Task<IActionResult> SetRole(Guid userId, Guid roleId)
-    {
-        await userService.SetRoleAsync(userId, roleId);
-        return NoContent();
-    }
+    public async Task SetRole(Guid userId, Guid roleId)
+        => await userService.SetRoleAsync(userId, roleId);
 }

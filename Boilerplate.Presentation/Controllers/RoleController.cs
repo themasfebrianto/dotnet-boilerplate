@@ -9,10 +9,9 @@ namespace Boilerplate.Presentation.Controllers;
 /// Role management endpoints.
 /// Controllers are thin - just call service and return.
 /// </summary>
-[ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class RoleController(IRoleService roleService) : ControllerBase
+public class RoleController(IRoleService roleService) : ApiController
 {
     [HttpGet]
     public async Task<List<RoleResponseDto>> GetAll()
@@ -30,7 +29,7 @@ public class RoleController(IRoleService roleService) : ControllerBase
     public async Task<ActionResult<RoleResponseDto>> Create([FromBody] RoleRequestDto request)
     {
         var role = await roleService.CreateAsync(request);
-        return CreatedAtAction(nameof(GetById), new { id = role.Id }, role);
+        return Created(role);
     }
 
     [HttpPut("{id:guid}")]
@@ -38,9 +37,6 @@ public class RoleController(IRoleService roleService) : ControllerBase
         => await roleService.UpdateAsync(id, request);
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        await roleService.DeleteAsync(id);
-        return NoContent();
-    }
+    public async Task Delete(Guid id)
+        => await roleService.DeleteAsync(id);
 }

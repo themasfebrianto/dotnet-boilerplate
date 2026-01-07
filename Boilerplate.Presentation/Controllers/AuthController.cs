@@ -10,9 +10,8 @@ namespace Boilerplate.Presentation.Controllers;
 /// Controllers are thin - just call service and return.
 /// Exception handling is done by middleware.
 /// </summary>
-[ApiController]
 [Route("api/[controller]")]
-public class AuthController(IAuthService authService) : ControllerBase
+public class AuthController(IAuthService authService) : ApiController
 {
     [HttpPost("login")]
     public async Task<LoginResponseDto> Login([FromBody] LoginRequestDto request)
@@ -27,9 +26,6 @@ public class AuthController(IAuthService authService) : ControllerBase
         => await authService.RefreshTokenAsync(request.RefreshToken);
 
     [HttpPost("revoke")]
-    public async Task<IActionResult> Revoke([FromBody] RefreshTokenRequestDto request)
-    {
-        await authService.RevokeTokenAsync(request.RefreshToken);
-        return NoContent();
-    }
+    public async Task Revoke([FromBody] RefreshTokenRequestDto request)
+        => await authService.RevokeTokenAsync(request.RefreshToken);
 }

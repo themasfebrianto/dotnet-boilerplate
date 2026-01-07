@@ -1,67 +1,33 @@
 using Boilerplate.Application.Interfaces.Repositories;
 using Boilerplate.Domain.Entities;
 using Boilerplate.Infrastructure.Persistence.Common;
+using Boilerplate.Infrastructure.Persistence.Repositories.Common;
 using MongoDB.Driver;
 
 namespace Boilerplate.Infrastructure.Persistence.Repositories;
 
 /// <summary>
 /// User repository implementation for MongoDB.
+/// Extends MongoRepositoryBase for standard CRUD, only implements entity-specific methods.
 /// </summary>
-public class UserRepository(IMongoDbContext context) : IUserRepository
+public class UserRepository(IMongoDbContext context) 
+    : MongoRepositoryBase<User>(context), IUserRepository
 {
-    private readonly IMongoCollection<User> _collection = context.GetCollection<User>();
-
-    public async Task<User?> GetByIdAsync(Guid id)
-    {
-        var filter = FilterDefinitionHelper.ByIdNotDeleted<User>(id);
-        return await _collection.Find(filter).FirstOrDefaultAsync();
-    }
-
+    /// <summary>
+    /// Get user by email address, excluding soft-deleted records.
+    /// </summary>
     public async Task<User?> GetByEmailAsync(string email)
     {
-        var filter = Builders<User>.Filter.Eq(x => x.Email, email)
-            .AndNotDeleted();
-        return await _collection.Find(filter).FirstOrDefaultAsync();
+        var filter = Builders<User>.Filter.Eq(x => x.Email, email);
+        return await FindOneAsync(filter);
     }
 
-    public async Task<List<User>> GetAllAsync()
-    {
-        var filter = FilterDefinitionHelper.NotDeleted<User>();
-        return await _collection.Find(filter).ToListAsync();
-    }
-
-    public async Task<User> CreateAsync(User user)
-    {
-        await _collection.InsertOneAsync(user);
-        return user;
-    }
-
-    public async Task<User> UpdateAsync(User user)
-    {
-        var filter = FilterDefinitionHelper.ById<User>(user.Id);
-        var update = UpdateDefinitionHelper.FromEntity(user, nameof(User.Id), nameof(User.CreatedAt));
-        
-        await _collection.UpdateOneAsync(filter, update);
-        return user;
-    }
-
-    public async Task DeleteAsync(Guid id)
-    {
-        var filter = FilterDefinitionHelper.ById<User>(id);
-        await _collection.DeleteOneAsync(filter);
-    }
-
-    public async Task<bool> ExistsAsync(Guid id)
-    {
-        var filter = FilterDefinitionHelper.ByIdNotDeleted<User>(id);
-        return await _collection.CountDocumentsAsync(filter) > 0;
-    }
-
+    /// <summary>
+    /// Check if an email address is already registered.
+    /// </summary>
     public async Task<bool> EmailExistsAsync(string email)
     {
-        var filter = Builders<User>.Filter.Eq(x => x.Email, email)
-            .AndNotDeleted();
-        return await _collection.CountDocumentsAsync(filter) > 0;
+        var filter = Builders<User>.Filter.Eq(x => x.Email, email);
+        return await AnyAsync(filter);
     }
 }
