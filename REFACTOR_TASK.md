@@ -494,26 +494,26 @@ app.Run();
 ### Phase 5: Presentation Layer
 | Step | Task | Status |
 |------|------|--------|
-| 5.1 | `Middleware/ExceptionMiddleware.cs` | ⬜ |
-| 5.2 | `Services/CurrentUserService.cs` | ⬜ |
-| 5.3 | `Extensions/CorsExtensions.cs` | ⬜ |
-| 5.4 | `Extensions/JwtExtensions.cs` | ⬜ |
-| 5.5 | `Extensions/SettingsExtensions.cs` | ⬜ |
-| 5.6 | `Extensions/SwaggerExtensions.cs` | ⬜ |
-| 5.7 | `Controllers/AuthController.cs` | ⬜ |
-| 5.8 | `Controllers/UserController.cs` | ⬜ |
-| 5.9 | `Controllers/RoleController.cs` | ⬜ |
-| 5.10 | `Program.cs` | ⬜ |
-| 5.11 | `appsettings.json` | ⬜ |
+| 5.1 | `Middleware/ExceptionMiddleware.cs` | ✅ |
+| 5.2 | `Services/CurrentUserService.cs` | ✅ |
+| 5.3 | `Extensions/CorsExtensions.cs` | ✅ |
+| 5.4 | `Extensions/JwtExtensions.cs` | ✅ |
+| 5.5 | `Extensions/PresentationExtensions.cs` | ✅ |
+| 5.6 | `Extensions/SwaggerExtensions.cs` | ✅ |
+| 5.7 | `Controllers/AuthController.cs` | ✅ |
+| 5.8 | `Controllers/UserController.cs` | ✅ |
+| 5.9 | `Controllers/RoleController.cs` | ✅ |
+| 5.10 | `Program.cs` | ✅ |
+| 5.11 | `appsettings.json` | ✅ |
 
 ### Phase 6: Finalize
 | Step | Task | Status |
 |------|------|--------|
-| 6.1 | `.gitignore` | ⬜ |
-| 6.2 | `.env.example` | ⬜ |
-| 6.3 | `README.md` | ⬜ |
-| 6.4 | `dotnet build` ✅ | ⬜ |
-| 6.5 | Git commit | ⬜ |
+| 6.1 | `.gitignore` | ✅ |
+| 6.2 | `.env.example` | ✅ |
+| 6.3 | `README.md` | ✅ |
+| 6.4 | `dotnet build` ✅ | ✅ |
+| 6.5 | Git commit | ✅ |
 
 ---
 

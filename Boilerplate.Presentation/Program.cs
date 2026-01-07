@@ -1,44 +1,41 @@
+using Boilerplate.Application;
+using Boilerplate.Infrastructure;
+using Boilerplate.Presentation.Extensions;
+using Boilerplate.Presentation.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// ============================================
+// Service Registration (each layer owns its DI)
+// ============================================
+builder.Services
+    .AddPresentation(builder.Configuration)  // Presentation layer (controllers, auth, swagger)
+    .AddApplication()                         // Application layer (services)
+    .AddInfrastructure(builder.Configuration); // Infrastructure layer (repositories, providers)
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ============================================
+// Middleware Pipeline (order matters!)
+// ============================================
 
-app.UseHttpsRedirection();
+// 1. Exception handling (must be first to catch all exceptions)
+app.UseExceptionMiddleware();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// 2. Swagger (development only)
+app.UseSwaggerDocumentation(app.Environment);
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+// 3. CORS
+app.UseCorsPolicy();
 
+// 4. Authentication & Authorization
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 5. Map controllers
+app.MapControllers();
+
+// ============================================
+// Run
+// ============================================
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
