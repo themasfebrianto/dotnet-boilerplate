@@ -44,10 +44,6 @@ public class UserController(IUserService userService) : ApiController
     public async Task ChangePassword(Guid id, [FromBody] ChangePasswordRequestDto request)
         => await userService.ChangePasswordAsync(id, request);
 
-    [HttpPost("{id:guid}/soft-delete")]
-    public async Task SoftDelete(Guid id)
-        => await userService.SoftDeleteAsync(id);
-
     [HttpPost("{userId:guid}/role/{roleId:guid}")]
     public async Task SetRole(Guid userId, Guid roleId)
         => await userService.SetRoleAsync(userId, roleId);

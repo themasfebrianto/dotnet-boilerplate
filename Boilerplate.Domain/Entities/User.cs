@@ -5,9 +5,9 @@ namespace Boilerplate.Domain.Entities;
 
 /// <summary>
 /// User entity representing an authenticated user in the system.
-/// Implements ISoftDeletable for soft delete and IAuditable for user tracking.
+/// Implements IAuditable for user tracking.
 /// </summary>
-public class User : BaseEntity, ISoftDeletable, IAuditable
+public class User : BaseEntity, IAuditable
 {
     // Core user properties
     public string Email { get; set; } = null!;
@@ -18,10 +18,6 @@ public class User : BaseEntity, ISoftDeletable, IAuditable
     public bool IsEmailVerified { get; set; } = false;
     public Guid? RoleId { get; set; }
     public DateTime? LastLoginAt { get; set; }
-
-    // ISoftDeletable implementation
-    public DateTime? DeletedAt { get; set; }
-    public Guid? DeletedBy { get; set; }
 
     // IAuditable implementation
     public Guid? CreatedBy { get; set; }

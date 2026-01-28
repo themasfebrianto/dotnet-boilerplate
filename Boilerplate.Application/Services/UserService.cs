@@ -97,17 +97,6 @@ public class UserService(
         await userRepository.UpdateAsync(user);
     }
 
-    public async Task SoftDeleteAsync(Guid id)
-    {
-        var user = await userRepository.GetByIdAsync(id)
-            ?? throw new NotFoundException("User", id);
-
-        user.DeletedAt = DateTime.UtcNow;
-        user.DeletedBy = currentUserService.UserId;
-
-        await userRepository.UpdateAsync(user);
-    }
-
     public async Task SetRoleAsync(Guid userId, Guid roleId)
     {
         var user = await userRepository.GetByIdAsync(userId)

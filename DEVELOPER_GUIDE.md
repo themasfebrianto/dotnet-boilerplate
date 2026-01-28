@@ -22,7 +22,7 @@
 
 | Layer | Responsibility |
 |-------|---------------|
-| **Domain** | Entities + interfaces (`ISoftDeletable`, `IAuditable`) |
+| **Domain** | Entities + interfaces (`IAuditable`) |
 | **Application** | Throw intentful exceptions, orchestrate business logic |
 | **Infrastructure** | Implement repositories, external services, persistence |
 | **Presentation** | Thin controllers (3-5 lines), middleware owns HTTP |
@@ -84,16 +84,12 @@ using Boilerplate.Domain.Common.Interfaces;
 
 namespace Boilerplate.Domain.Entities;
 
-public class Product : BaseEntity, ISoftDeletable, IAuditable
+public class Product : BaseEntity, IAuditable
 {
     public string Name { get; set; } = null!;
-    public string? Description { get; set; }
+    public string? Description { get; set; };
     public decimal Price { get; set; }
     public int Stock { get; set; }
-
-    // ISoftDeletable
-    public DateTime? DeletedAt { get; set; }
-    public Guid? DeletedBy { get; set; }
 
     // IAuditable
     public Guid? CreatedBy { get; set; }
@@ -230,9 +226,6 @@ public interface IProductService
     
     /// <exception cref="Common.Exceptions.NotFoundException">Product not found.</exception>
     Task DeleteAsync(Guid id);
-    
-    /// <exception cref="Common.Exceptions.NotFoundException">Product not found.</exception>
-    Task SoftDeleteAsync(Guid id);
 }
 ```
 
@@ -308,17 +301,6 @@ public class ProductService(
 
         await productRepository.DeleteAsync(id);
     }
-
-    public async Task SoftDeleteAsync(Guid id)
-    {
-        var product = await productRepository.GetByIdAsync(id)
-            ?? throw new NotFoundException("Product", id);
-
-        product.DeletedAt = DateTime.UtcNow;
-        product.DeletedBy = currentUserService.UserId;
-
-        await productRepository.UpdateAsync(product);
-    }
 }
 ```
 
@@ -361,12 +343,12 @@ public class ProductRepository(IMongoDbContext context)
 ```
 
 **Why here?** Infrastructure owns persistence. `MongoRepositoryBase` provides:
-- `GetByIdAsync(Guid id)` — with soft-delete filter
-- `GetAllAsync()` — with soft-delete filter  
+- `GetByIdAsync(Guid id)`
+- `GetAllAsync()`
 - `CreateAsync(T entity)` — sets Id and CreatedAt
 - `UpdateAsync(T entity)` — sets UpdatedAt
-- `DeleteAsync(Guid id)` — hard delete
-- `ExistsAsync(Guid id)` — with soft-delete filter
+- `DeleteAsync(Guid id)`
+- `ExistsAsync(Guid id)`
 - `FindAsync(filter)` — protected helper for custom queries
 - `FindOneAsync(filter)` — protected helper for single-entity queries
 - `AnyAsync(filter)` — protected helper for existence checks
@@ -418,10 +400,6 @@ public class ProductController(IProductService productService) : ApiController
     [HttpDelete("{id:guid}")]
     public async Task Delete(Guid id)
         => await productService.DeleteAsync(id);
-
-    [HttpPost("{id:guid}/soft-delete")]
-    public async Task SoftDelete(Guid id)
-        => await productService.SoftDeleteAsync(id);
 }
 ```
 

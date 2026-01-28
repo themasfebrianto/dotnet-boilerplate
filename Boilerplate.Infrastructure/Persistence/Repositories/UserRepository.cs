@@ -14,7 +14,7 @@ public class UserRepository(IMongoDbContext context)
     : MongoRepositoryBase<User>(context), IUserRepository
 {
     /// <summary>
-    /// Get user by email address, excluding soft-deleted records.
+    /// Get user by email address.
     /// </summary>
     public async Task<User?> GetByEmailAsync(string email)
     {

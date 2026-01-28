@@ -14,7 +14,7 @@ public class RoleRepository(IMongoDbContext context)
     : MongoRepositoryBase<Role>(context), IRoleRepository
 {
     /// <summary>
-    /// Get role by name, excluding soft-deleted records.
+    /// Get role by name.
     /// </summary>
     public async Task<Role?> GetByNameAsync(string name)
     {

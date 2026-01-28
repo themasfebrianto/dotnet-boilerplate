@@ -29,9 +29,6 @@ public interface IUserService
     /// <exception cref="Common.Exceptions.ValidationException">Invalid current password.</exception>
     Task ChangePasswordAsync(Guid id, ChangePasswordRequestDto request);
 
-    /// <exception cref="Common.Exceptions.NotFoundException">User not found.</exception>
-    Task SoftDeleteAsync(Guid id);
-
     /// <exception cref="Common.Exceptions.NotFoundException">User or role not found.</exception>
     Task SetRoleAsync(Guid userId, Guid roleId);
 }

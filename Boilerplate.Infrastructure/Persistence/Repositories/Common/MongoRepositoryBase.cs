@@ -1,16 +1,15 @@
 using Boilerplate.Domain.Common;
-using Boilerplate.Domain.Common.Interfaces;
 using Boilerplate.Infrastructure.Persistence.Common;
 using MongoDB.Driver;
 
 namespace Boilerplate.Infrastructure.Persistence.Repositories.Common;
 
 /// <summary>
-/// Generic base repository for MongoDB with built-in soft-delete support.
+/// Generic base repository for MongoDB.
 /// Reduces boilerplate for standard CRUD operations.
 /// </summary>
-/// <typeparam name="T">Entity type that must extend BaseEntity and implement ISoftDeletable.</typeparam>
-public abstract class MongoRepositoryBase<T> where T : BaseEntity, ISoftDeletable
+/// <typeparam name="T">Entity type that must extend BaseEntity.</typeparam>
+public abstract class MongoRepositoryBase<T> where T : BaseEntity
 {
     protected readonly IMongoCollection<T> Collection;
 
@@ -20,21 +19,20 @@ public abstract class MongoRepositoryBase<T> where T : BaseEntity, ISoftDeletabl
     }
 
     /// <summary>
-    /// Get entity by ID, excluding soft-deleted records.
+    /// Get entity by ID.
     /// </summary>
     public virtual async Task<T?> GetByIdAsync(Guid id)
     {
-        var filter = FilterDefinitionHelper.ByIdNotDeleted<T>(id);
+        var filter = FilterDefinitionHelper.ById<T>(id);
         return await Collection.Find(filter).FirstOrDefaultAsync();
     }
 
     /// <summary>
-    /// Get all entities, excluding soft-deleted records.
+    /// Get all entities.
     /// </summary>
     public virtual async Task<List<T>> GetAllAsync()
     {
-        var filter = FilterDefinitionHelper.NotDeleted<T>();
-        return await Collection.Find(filter).ToListAsync();
+        return await Collection.Find(Builders<T>.Filter.Empty).ToListAsync();
     }
 
     /// <summary>
@@ -62,7 +60,7 @@ public abstract class MongoRepositoryBase<T> where T : BaseEntity, ISoftDeletabl
     }
 
     /// <summary>
-    /// Hard delete an entity by ID.
+    /// Delete an entity by ID.
     /// </summary>
     public virtual async Task DeleteAsync(Guid id)
     {
@@ -71,35 +69,35 @@ public abstract class MongoRepositoryBase<T> where T : BaseEntity, ISoftDeletabl
     }
 
     /// <summary>
-    /// Check if an entity exists by ID, excluding soft-deleted records.
+    /// Check if an entity exists by ID.
     /// </summary>
     public virtual async Task<bool> ExistsAsync(Guid id)
     {
-        var filter = FilterDefinitionHelper.ByIdNotDeleted<T>(id);
+        var filter = FilterDefinitionHelper.ById<T>(id);
         return await Collection.CountDocumentsAsync(filter) > 0;
     }
 
     /// <summary>
-    /// Find entities matching a filter, excluding soft-deleted records.
+    /// Find entities matching a filter.
     /// </summary>
     protected async Task<List<T>> FindAsync(FilterDefinition<T> filter)
     {
-        return await Collection.Find(filter.AndNotDeleted()).ToListAsync();
+        return await Collection.Find(filter).ToListAsync();
     }
 
     /// <summary>
-    /// Find a single entity matching a filter, excluding soft-deleted records.
+    /// Find a single entity matching a filter.
     /// </summary>
     protected async Task<T?> FindOneAsync(FilterDefinition<T> filter)
     {
-        return await Collection.Find(filter.AndNotDeleted()).FirstOrDefaultAsync();
+        return await Collection.Find(filter).FirstOrDefaultAsync();
     }
 
     /// <summary>
-    /// Check if any entity matches a filter, excluding soft-deleted records.
+    /// Check if any entity matches a filter.
     /// </summary>
     protected async Task<bool> AnyAsync(FilterDefinition<T> filter)
     {
-        return await Collection.CountDocumentsAsync(filter.AndNotDeleted()) > 0;
+        return await Collection.CountDocumentsAsync(filter) > 0;
     }
 }
